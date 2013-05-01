@@ -1,35 +1,40 @@
 document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady() {
-    var that = this,
-        App = new downloadApp();
+	var that = this,
+	App = new downloadApp(),
+	fileName = "sample.png",
+	uri = encodeURI("http://www.icenium.com/assets/img/icenium-logo.png");
     
-    navigator.splashscreen.hide();
-    App.run();
+	navigator.splashscreen.hide();
+	App.run(uri, fileName);
 }
 
 var downloadApp = function() {
 }
 
 downloadApp.prototype = {
-	run: function() {
-		var that = this;
+	run: function(uri, fileName) {
+		var that = this,
+		filePath = "";
         
 		document.getElementById("download").addEventListener("click", function() {
 			that.getFilesystem(
 				function(fileSystem) {
-                    
 					console.log("gotFS");
                     
 					if (device.platform === "Android") {
 						that.getFolder(fileSystem, "test", function(folder) {
-							that.transferFile(folder.fullPath)
+							filePath = folder.fullPath + "\/" + fileName;
+							that.transferFile(uri, filePath)
 						}, function() {
 							console.log("failed to get folder");
 						});
-					} else {
-                        that.transferFile(fileSystem.root.fullPath)
-                    }
+					}
+					else {
+						filePath = fileSystem.root.fullPath + "\/" + fileName;
+						that.transferFile(uri, filePath)
+					}
 				},
 				function() {
 					console.log("failed to get filesystem");
@@ -47,17 +52,15 @@ downloadApp.prototype = {
 		fileSystem.root.getDirectory(folderName, {create: true, exclusive: false}, success, fail)
 	},
 
-	transferFile: function (fileSystemPath) {
-		var transfer = new FileTransfer(),
-		uri = encodeURI("http://www.icenium.com/assets/img/icenium-logo.png");
-		filePath = fileSystemPath + '/sample.png';
+	transferFile: function (uri, filePath) {
+		var transfer = new FileTransfer();
 		transfer.download(
 			uri,
 			filePath,
 			function(entry) {
 				var image = document.getElementById("downloadedImage");
 				image.src = entry.fullPath;
-                document.getElementById("result").innerHTML = "File saved to: " + entry.fullPath;
+				document.getElementById("result").innerHTML = "File saved to: " + entry.fullPath;
 			},
 			function(error) {
 				console.log("download error source " + error.source);
