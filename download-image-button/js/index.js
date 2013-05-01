@@ -4,17 +4,18 @@ function onDeviceReady() {
 	var that = this,
 	App = new downloadApp(),
 	fileName = "sample.png",
-	uri = encodeURI("http://www.icenium.com/assets/img/icenium-logo.png");
+	uri = encodeURI("http://www.icenium.com/assets/img/icenium-logo.png"),
+    folderName = "test";
     
 	navigator.splashscreen.hide();
-	App.run(uri, fileName);
+	App.run(uri, fileName, folderName);
 }
 
 var downloadApp = function() {
 }
 
 downloadApp.prototype = {
-	run: function(uri, fileName) {
+	run: function(uri, fileName, folderName) {
 		var that = this,
 		filePath = "";
         
@@ -24,7 +25,7 @@ downloadApp.prototype = {
 					console.log("gotFS");
                     
 					if (device.platform === "Android") {
-						that.getFolder(fileSystem, "test", function(folder) {
+						that.getFolder(fileSystem, folderName, function(folder) {
 							filePath = folder.fullPath + "\/" + fileName;
 							that.transferFile(uri, filePath)
 						}, function() {
